@@ -3,6 +3,12 @@
 REQUIRED_PKG="neovim"
 OS="$(uname -s)"
 DIR="$HOME/.config/nvim"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+if [ "$EUID" -ne 0 ]; then
+    echo "Please run this script with sudo."
+    exit 1
+fi
 
 #Make sure what distro is that
 case "${OS}" in
@@ -32,14 +38,14 @@ esac
 
 #Make sure that nvim is installed
 if [! command -v "$REQUIRED_PKG" &> /dev/null]; then
-	echo "$REQUIRED_PKG could not be found."
+	echo "Neovim could not be found."
 	
 	case "$MACHINE" in
 		"LINUX")
 			case "$DISTRO" in
 				arch)
 					echo "#@#############################################################@#"
-					echo "Installing on Arch linux, also install vim-plug for $REQUIRED_PKG"
+					echo "Installing on Arch linux, also install vim-plug for Neovim"
 					echo "#@#############################################################@#"
 					sudo pacman -S --noconfirm "$REQUIRED_PKG"
 					sh -c 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim --create-dirs \
@@ -47,7 +53,7 @@ if [! command -v "$REQUIRED_PKG" &> /dev/null]; then
 					;;
 				postmarketos)
 					echo "#@###############################################################@#"
-					echo "Installing on PostMarketOS, also install vim-plug for $REQUIRED_PKG"
+					echo "Installing on PostMarketOS, also install vim-plug for Neovim"
 					echo "#@###############################################################@#"
 					sudo apk add "$REQUIRED_PKG"
 					sh -c 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim --create-dirs \
@@ -65,7 +71,7 @@ if [! command -v "$REQUIRED_PKG" &> /dev/null]; then
 			;;
 		"macOS")
 			echo "#@########################################################@#"
-			echo "Installing on macOS, also install vim-plug for $REQUIRED_PKG"
+			echo "Installing on macOS, also install vim-plug for Neovim"
 			echo "#@########################################################@#"
 			brew install "$REQUIRED_PKG"
 			sh -c 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim --create-dirs \
@@ -73,7 +79,7 @@ if [! command -v "$REQUIRED_PKG" &> /dev/null]; then
 			;;
 		"MinGw")
 			echo "#@##########################################################@#"
-			echo "Installing on Windows, also install vim-plug for $REQUIRED_PKG"
+			echo "Installing on Windows, also install vim-plug for Neovim"
 			echo "#@##########################################################@#"
 			winget install "$REQUIRED_PKG"
 			powershell.exe -Command "iwr -useb https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim | ni \"(\$num = \${env:XDG_DATA_HOME}; if(\$num){ \$num } else { \${env:LOCALAPPDATA} })/nvim-data/site/autoload/plug.vim\" -Force"
@@ -86,7 +92,7 @@ if [! command -v "$REQUIRED_PKG" &> /dev/null]; then
 	esac
 else
 	echo "#@##################################################################@#"
-	echo "$REQUIRED_PKG is installed, need to install vim-plug for $REQUIRED_PKG"
+	echo "Neovim is installed, need to install vim-plug for Neovim"
 	echo "#@##################################################################@#"
 
 	case "$MACHINE" in 
@@ -104,13 +110,18 @@ fi
 
 if [ -d "$DIR" ]; then
 	echo "#@########################################@#"
-	echo "$DIR is exist, dowloading init.lua into $DIR"
+	echo "$DIR is exist, copy init.lua into it"
 	echo "#@########################################@#"
+	cp "$SCRIPT_DIR/init.lua" "$DIR"
 else
 	echo "#@################################@#"
-	echo "No $DIR for init.lua , creating $DIR"
-	echo "#@################################@#"
+	echo "No directory for init.lua , creating $DIR"
 	mkdir -p "$DIR"
-#MAKE GIT TO INSTALL INIT.LUA
+	echo "Copy init.lua into $DIR"
+	echo "#@################################@#"
+	cp "$SCRIPT_DIR/init.lua" "$DIR"
 fi 
 
+echo "#@######################################@#"
+echo "FINISH! Please, enter :PlugInstall inside of Neovim"
+echo "#@######################################@#"
