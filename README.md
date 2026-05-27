@@ -7,6 +7,7 @@ NEED FOR AUTOCOMPLETE:
   CLANG
   
   For windows user , you can wite inside PowerShell "winget install -e --id LLVM.LLVM", or install it manually on your own (NOT TESTED LOL)
+  
   For linux or macOS user , you can download it with your favorite package manager like "sudo pacman -S clang" or some other shi
 
 USAGE:
